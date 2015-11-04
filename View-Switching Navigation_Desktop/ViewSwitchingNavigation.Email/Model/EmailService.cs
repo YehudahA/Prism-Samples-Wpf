@@ -5,8 +5,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel.Composition;
 using System.Linq;
-using System.Threading;
-using ViewSwitchingNavigation.Infrastructure;
+using System.Threading.Tasks;
 
 namespace ViewSwitchingNavigation.Email.Model
 {
@@ -34,41 +33,17 @@ namespace ViewSwitchingNavigation.Email.Model
                 };
         }
 
-        public IAsyncResult BeginGetEmailDocuments(AsyncCallback callback, object userState)
+        public async Task<IEnumerable<EmailDocument>> GetEmailDocumentsAsync()
         {
-            var asyncResult = new AsyncResult<IEnumerable<EmailDocument>>(callback, userState);
-            ThreadPool.QueueUserWorkItem(
-                o =>
-                {
-                    asyncResult.SetComplete(new ReadOnlyCollection<EmailDocument>(this.emailDocuments), false);
-                });
-
-            return asyncResult;
+            await Task.Delay(80);
+            var result = new ReadOnlyCollection<EmailDocument>(this.emailDocuments);
+            return result;
         }
 
-        public IEnumerable<EmailDocument> EndGetEmailDocuments(IAsyncResult asyncResult)
+        public async Task<bool> SendEmailDocumentAsync(EmailDocument email)
         {
-            var localAsyncResult = AsyncResult<IEnumerable<EmailDocument>>.End(asyncResult);
-
-            return localAsyncResult.Result;
-        }
-
-        public IAsyncResult BeginSendEmailDocument(EmailDocument email, AsyncCallback callback, object userState)
-        {
-            var asyncResult = new AsyncResult<object>(callback, userState);
-            ThreadPool.QueueUserWorkItem(
-                o =>
-                {
-                    Thread.Sleep(500);
-                    asyncResult.SetComplete(null, false);
-                });
-
-            return asyncResult;
-        }
-
-        public void EndSendEmailDocument(IAsyncResult asyncResult)
-        {
-            var localAsyncResult = AsyncResult<object>.End(asyncResult);
+            await Task.Delay(500);
+            return true;
         }
 
         public EmailDocument GetEmailDocument(Guid id)

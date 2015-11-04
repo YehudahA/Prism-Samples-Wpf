@@ -59,9 +59,9 @@
     <Reference Include="PresentationFramework" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AsyncResult.cs" />
     <Compile Include="DesignDataCollectionView.cs" />
     <Compile Include="ObjectToVisibilityConverter.cs" />
+    <Compile Include="ObservableCollectionExtensions.cs" />
     <Compile Include="ObservableCommand.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>

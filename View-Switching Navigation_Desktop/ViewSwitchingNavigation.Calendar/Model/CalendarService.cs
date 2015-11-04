@@ -4,8 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel.Composition;
-using System.Threading;
-using ViewSwitchingNavigation.Infrastructure;
+using System.Threading.Tasks;
 
 namespace ViewSwitchingNavigation.Calendar.Model
 {
@@ -52,23 +51,11 @@ namespace ViewSwitchingNavigation.Calendar.Model
                 };
         }
 
-        public IAsyncResult BeginGetMeetings(AsyncCallback callback, object userState)
+        public async Task<IEnumerable<Meeting>> GetMeetingsAsync()
         {
-            var asyncResult = new AsyncResult<IEnumerable<Meeting>>(callback, userState);
-            ThreadPool.QueueUserWorkItem(
-                o =>
-                {
-                    asyncResult.SetComplete(new ReadOnlyCollection<Meeting>(this.meetings), false);
-                });
-
-            return asyncResult;
-        }
-
-        public IEnumerable<Meeting> EndGetMeetings(IAsyncResult asyncResult)
-        {
-            var localAsyncResult = AsyncResult<IEnumerable<Meeting>>.End(asyncResult);
-
-            return localAsyncResult.Result;
+            await Task.Delay(100);
+            var result = new ReadOnlyCollection<Meeting>(meetings);
+            return result;
         }
     }
 }

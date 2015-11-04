@@ -1,10 +1,8 @@
 
 
-using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
-using System.Threading;
-using ViewSwitchingNavigation.Infrastructure;
+using System.Threading.Tasks;
 
 namespace ViewSwitchingNavigation.Contacts.Model
 {
@@ -17,18 +15,6 @@ namespace ViewSwitchingNavigation.Contacts.Model
         private const string Avatar3Uri = @"/ViewSwitchingNavigation.Contacts;component/Avatars/MC900433946.PNG";
         private const string Avatar4Uri = @"/ViewSwitchingNavigation.Contacts;component/Avatars/MC900434899.PNG";
 
-        public IAsyncResult BeginGetContacts(AsyncCallback callback, object userState)
-        {
-            var asyncResult = new AsyncResult<IEnumerable<Contact>>(callback, userState);
-            ThreadPool.QueueUserWorkItem(
-                o =>
-                {
-                    asyncResult.SetComplete(CreateContacts(), false);
-                });
-
-            return asyncResult;
-        }
-
         private static IEnumerable<Contact> CreateContacts()
         {
             List<Contact> contacts = new List<Contact>();
@@ -39,11 +25,12 @@ namespace ViewSwitchingNavigation.Contacts.Model
             return contacts;
         }
 
-        public IEnumerable<Contact> EndGetContacts(IAsyncResult asyncResult)
+        public async Task<IEnumerable<Contact>> GetContactsAsync()
         {
-            var localAsyncResult = AsyncResult<IEnumerable<Contact>>.End(asyncResult);
+            await Task.Delay(50);
+            var localResult = CreateContacts();
 
-            return localAsyncResult.Result;
+            return localResult;
         }
     }
 }

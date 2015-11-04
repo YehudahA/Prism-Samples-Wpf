@@ -3,21 +3,18 @@
 using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel.Composition;
-using System.Text;
-using System.Threading;
 using System.Windows.Input;
-using Prism.Common;
 using Prism.Commands;
 using Prism.Regions;
 using ViewSwitchingNavigation.Calendar.Model;
 using ViewSwitchingNavigation.Infrastructure;
+using System.Threading.Tasks;
 
 namespace ViewSwitchingNavigation.Calendar.ViewModels
 {
     [Export]
     public class CalendarViewModel
     {
-        private readonly SynchronizationContext synchronizationContext;
         private readonly DelegateCommand<Meeting> openMeetingEmailCommand;
         private readonly ObservableCollection<Meeting> meetings;
         private readonly IRegionManager regionManager;
@@ -30,8 +27,6 @@ namespace ViewSwitchingNavigation.Calendar.ViewModels
         [ImportingConstructor]
         public CalendarViewModel(ICalendarService calendarService, IRegionManager regionManager)
         {
-            this.synchronizationContext = SynchronizationContext.Current ?? new SynchronizationContext();
-
             this.openMeetingEmailCommand = new DelegateCommand<Meeting>(this.OpenMeetingEmail);
 
             this.meetings = new ObservableCollection<Meeting>();
@@ -39,22 +34,12 @@ namespace ViewSwitchingNavigation.Calendar.ViewModels
             this.calendarService = calendarService;
             this.regionManager = regionManager;
 
-            this.calendarService.BeginGetMeetings(
-                r =>
-                {
-                    var meetings = this.calendarService.EndGetMeetings(r);
+            LoadMeetings();
+        }
 
-                    this.synchronizationContext.Post(
-                        s =>
-                        {
-                            foreach (var meeting in meetings)
-                            {
-                                this.Meetings.Add(meeting);
-                            }
-                        },
-                        null);
-                },
-                null);
+        private async Task LoadMeetings()
+        {
+            meetings.AddRange(await calendarService.GetMeetingsAsync());
         }
 
         public ObservableCollection<Meeting> Meetings

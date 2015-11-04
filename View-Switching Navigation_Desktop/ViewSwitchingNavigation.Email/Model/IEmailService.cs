@@ -2,16 +2,20 @@
 
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace ViewSwitchingNavigation.Email.Model
 {
     public interface IEmailService
     {
-        IAsyncResult BeginGetEmailDocuments(AsyncCallback callback, object userState);
-        IEnumerable<EmailDocument> EndGetEmailDocuments(IAsyncResult result);
-
-        IAsyncResult BeginSendEmailDocument(EmailDocument email, AsyncCallback callback, object userState);
-        void EndSendEmailDocument(IAsyncResult result);
+        Task<IEnumerable<EmailDocument>> GetEmailDocumentsAsync();
+        
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="email"></param>
+        /// <returns>true is sent, false if exception occoured</returns>
+        Task<bool> SendEmailDocumentAsync(EmailDocument email);
 
         EmailDocument GetEmailDocument(Guid id);
     }
