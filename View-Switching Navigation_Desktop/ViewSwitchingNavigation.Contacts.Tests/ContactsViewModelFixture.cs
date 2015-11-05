@@ -1,15 +1,11 @@
 
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using Prism.Regions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using ViewSwitchingNavigation.Contacts.Model;
 using ViewSwitchingNavigation.Contacts.ViewModels;
 using ViewSwitchingNavigation.Infrastructure;
-using System.Collections.ObjectModel;
 using System.Windows.Data;
 
 namespace ViewSwitchingNavigation.Contacts.Tests
@@ -25,7 +21,7 @@ namespace ViewSwitchingNavigation.Contacts.Tests
 
             var viewModel = new ContactsViewModel(contactsServiceMock.Object, regionManager);
 
-            contactsServiceMock.Verify(svc => svc.BeginGetContacts(It.IsAny<AsyncCallback>(), null));
+            contactsServiceMock.Verify(svc => svc.GetContactsAsync());
             Assert.IsTrue(viewModel.Contacts.IsEmpty);
         }
 
@@ -33,16 +29,11 @@ namespace ViewSwitchingNavigation.Contacts.Tests
         public void WhenContactIsSelected_ThenEmailContactCommandIsEnabledAndNotifiesChange()
         {
             var contactsServiceMock = new Mock<IContactsService>();
-            AsyncCallback callback = null;
-            var resultMock = new Mock<IAsyncResult>();
-            contactsServiceMock
-                .Setup(svc => svc.BeginGetContacts(It.IsAny<AsyncCallback>(), null))
-                .Callback<AsyncCallback, object>((cb, s) => callback = cb)
-                .Returns(resultMock.Object);
             var contacts = new[] { new Contact { }, new Contact { } };
+
             contactsServiceMock
-                .Setup(svc => svc.EndGetContacts(resultMock.Object))
-                .Returns(contacts);
+                .Setup(svc => svc.GetContactsAsync())
+                .ReturnsAsync(contacts);
 
             var regionManager = new RegionManager();
 
@@ -60,16 +51,11 @@ namespace ViewSwitchingNavigation.Contacts.Tests
         public void WhenSendingEmail_ThenNavigatesWithAToQueryParameter()
         {
             var contactsServiceMock = new Mock<IContactsService>();
-            AsyncCallback callback = null;
-            var resultMock = new Mock<IAsyncResult>();
-            contactsServiceMock
-                .Setup(svc => svc.BeginGetContacts(It.IsAny<AsyncCallback>(), null))
-                .Callback<AsyncCallback, object>((cb, s) => callback = cb)
-                .Returns(resultMock.Object);
             var contacts = new[] { new Contact { EmailAddress = "email" }, new Contact { } };
+
             contactsServiceMock
-                .Setup(svc => svc.EndGetContacts(resultMock.Object))
-                .Returns(contacts);
+                .Setup(svc => svc.GetContactsAsync())
+                .ReturnsAsync(contacts);
 
             //Mock<IRegion> regionMock = new Mock<IRegion>();
             //regionMock
